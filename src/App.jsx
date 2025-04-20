@@ -1,11 +1,10 @@
 import { useState, useRef } from 'react'
-import './index.css'
 import { generateStory } from './services/api'
 import StoryDisplay from './components/StoryDisplay'
 import { FaMicrophone, FaMicrophoneSlash, FaStar, FaArrowLeft } from 'react-icons/fa'
-
 import backgroundImage from "./assets/background.jpg";
 
+import './index.css'
 
 function App() {
   const [storyPrompt, setStoryPrompt] = useState('')
@@ -18,7 +17,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [characterError, setCharacterError] = useState(false)
   const [isListening, setIsListening] = useState(false)
+
   const recognitionRef = useRef(null)
+
   const [characters, setCharacters] = useState([
     'Kedi', 'Ejderha', 'Çocuk', 'Uzay Gemisi',
     'Süper Kahraman', 'Sihirli Unicorn', 'Robot',
@@ -57,6 +58,7 @@ function App() {
 
       console.log('Hikaye başarıyla oluşturuldu')
       setGeneratedStory(story)
+
     } catch (error) {
       console.error('Hata detayı:', error)
       setError(
@@ -200,13 +202,13 @@ function App() {
                     </button>
                   ))}
                 </div>
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={customCharacter}
                     onChange={(e) => setCustomCharacter(e.target.value)}
                     placeholder="Özel karakter ekle..."
-                    className="flex-1 p-2 rounded-lg border-2 border-[hsla(42,72%,47%,1)] focus:outline-none focus:border-yellow-500"
+                    className="w-full sm:flex-1 p-2 rounded-lg border-2 border-[hsla(42,72%,47%,1)] focus:outline-none focus:border-yellow-500"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter' && customCharacter.trim()) {
                         setCharacters([...characters, customCharacter.trim()]);
@@ -223,7 +225,7 @@ function App() {
                         setCustomCharacter('');
                       }
                     }}
-                    className="px-4 py-2 bg-[hsla(42,72%,47%,1)] text-white rounded-lg hover:bg-yellow-500 transition-colors"
+                    className="w-full sm:w-auto min-w-[100px] px-4 py-2 bg-[hsla(42,72%,47%,1)] text-white rounded-lg hover:bg-yellow-500 transition-colors"
                   >
                     Ekle
                   </button>

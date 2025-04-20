@@ -211,39 +211,38 @@ export default function ChatSayfasi() {
             <div className="relative z-10 flex flex-col h-screen">
                 {/* Header */}
                 <div className="bg-white/60 backdrop-blur-sm p-4 shadow-md">
-                    <div className="max-w-3xl flex items-center justify-between">
+                    <div className="max-w-3xl mx-auto w-full flex items-center justify-between px-4">
                         <button
                             onClick={() => navigate('/favorites')}
                             className="btn-primary mx-0 bg-yellow-500 hover:bg-yellow-600"
                         >
-                            <FaArrowLeft className="w-8 h-6" />
+                            <FaArrowLeft className="w-6 h-4 sm:w-8 sm:h-6" />
                         </button>
-
                     </div>
                 </div>
 
                 {/* Mesajlar */}
-                <div className="flex-1 overflow-y-auto p-4" style={{ display: 'flex', flexDirection: 'column-reverse' }}>
+                <div className="flex-1 overflow-y-auto p-2 sm:p-4" style={{ display: 'flex', flexDirection: 'column-reverse' }}>
                     <div ref={messageEndRef} />
                     {messages.map((item) => (
                         <div key={item.id} className={`mb-2 ${item.type === 'send' ? 'ml-auto' : 'mr-auto'}`}>
-                            <div className={`rounded-lg px-4 py-2 max-w-[75%] flex items-center gap-2 ${item.type === 'send'
-                                ? 'bg-yellow-500 text-white mr-8'
-                                : 'bg-white/90 backdrop-blur-sm ml-8 text-[hsla(42,72%,47%,1)]'
+                            <div className={`rounded-lg px-2 sm:px-4 py-2 max-w-[85%] sm:max-w-[75%] flex flex-wrap sm:flex-nowrap items-center gap-2 ${item.type === 'send'
+                                ? 'bg-yellow-500 text-white mr-4 sm:mr-8'
+                                : 'bg-white/90 backdrop-blur-sm ml-4 sm:ml-8 text-[hsla(42,72%,47%,1)]'
                                 }`}>
-                                <span>{item.text}</span>
+                                <span className="w-full sm:w-auto break-words">{item.text}</span>
                                 {item.type === 'receive' && (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start mt-2 sm:mt-0">
                                         <button
                                             onClick={() => speak(item.text)}
-                                            className="ml-2 text-yellow-600 hover:text-yellow-700"
+                                            className="text-yellow-600 hover:text-yellow-700"
                                             title="Sesli Dinle"
                                         >
                                             {isSpeaking ? <FaStop className="w-4 h-4" /> : <FaPlay className="w-4 h-4" />}
                                         </button>
                                         <button
                                             onClick={() => handleAddToStory(item.text)}
-                                            className="ml-2 text-yellow-600 hover:text-yellow-700"
+                                            className="text-yellow-600 hover:text-yellow-700"
                                             title="Bu Metni Hikayeye Ekle"
                                         >
                                             <FaPlus className="w-4 h-4" />
@@ -255,7 +254,7 @@ export default function ChatSayfasi() {
                     ))}
                     {isTyping && (
                         <div className="mb-2 mr-auto">
-                            <div className="bg-gray-200 text-gray-800 rounded-lg px-4 py-2">
+                            <div className="bg-gray-200 text-gray-800 rounded-lg px-2 sm:px-4 py-2 ml-4 sm:ml-8">
                                 Yazıyor...
                             </div>
                         </div>
@@ -263,31 +262,32 @@ export default function ChatSayfasi() {
                 </div>
 
                 {/* Mesaj gönderme alanı */}
-                <div className="bg-white/80 backdrop-blur-sm p-4 border-t">
-                    <div className="max-w-3xl mx-auto flex items-center gap-2">
+                <div className="bg-white/80 backdrop-blur-sm p-2 sm:p-4 border-t">
+                    <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center gap-2">
                         <input
                             ref={inputRef}
                             type="text"
-                            className="flex-1 border-2 border-yellow-500 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white/90"
+                            className="w-full flex-1 border-2 border-yellow-500 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white/90"
                             value={message}
                             placeholder="Hikayeyi nasıl değiştirmek istersin?"
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
                         />
-                        <button
-                            onClick={toggleListening}
-                            className={`btn-primary px-4 py-2 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-yellow-500 hover:bg-yellow-600'
-                                }`}
-                        >
-                            <FaMicrophone className={`w-6 h-6 ${isListening ? 'animate-pulse' : ''}`} />
-                        </button>
-                        <button
-                            className="btn-primary bg-yellow-500 hover:bg-yellow-600 px-6 py-2"
-                            onClick={sendMsg}
-                            disabled={!message.trim()}
-                        >
-                            Gönder
-                        </button>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                            <button
+                                onClick={toggleListening}
+                                className={`flex-1 sm:flex-none btn-primary px-4 py-2 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-yellow-500 hover:bg-yellow-600'}`}
+                            >
+                                <FaMicrophone className={`w-6 h-6 ${isListening ? 'animate-pulse' : ''}`} />
+                            </button>
+                            <button
+                                className="flex-1 sm:flex-none btn-primary bg-yellow-500 hover:bg-yellow-600 px-6 py-2"
+                                onClick={sendMsg}
+                                disabled={!message.trim()}
+                            >
+                                Gönder
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

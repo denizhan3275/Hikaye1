@@ -16,6 +16,9 @@ export default {
                     DEFAULT: '#6366f1',
                     hover: '#4f46e5'
                 },
+
+
+
                 'custom-border': '  rgb(0, 0, 0)',
 
                 'bg-carAndTextArea': " hsla(42, 72%, 47%, 1)",

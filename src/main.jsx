@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import App from './App'
 import AnaSayfa from './pages/AnaSayfa'
 import Favorites from './pages/Favorites'
-import ChatSayfasi from './pages/ChatSayfasi'
-import ChatSayfasi2 from './pages/ChatSayfasi2'
+import ChatSayfasi from './pages/chatSayfasi'
+import ChatSayfasi2 from './pages/chatSayfasi2'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -35,17 +35,17 @@ function AnaSayfa() {
                 {/* Butonlar */}
                 <div className="flex-1 flex items-center justify-center">
                     <div className="text-center p-8 max-w-3xl w-full">
-                        <div className="flex space-x-72">
+                        <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:space-x-4">
                             <button
                                 onClick={() => navigate('/app')}
-                                className="w-1/2 btn-primary bg-yellow-500 hover:bg-yellow-600 text-white text-xl py-8 px-8 rounded-lg transition-all transform hover:scale-105"
+                                className="w-full md:w-1/2 btn-primary bg-yellow-500 hover:bg-yellow-600 text-white text-xl py-8 px-8 rounded-lg transition-all transform hover:scale-105"
                             >
                                 Sıfırdan Hikaye Oluştur
                             </button>
 
                             <button
                                 onClick={() => navigate('/chat2')}
-                                className="w-1/2 btn-primary bg-yellow-500 hover:bg-yellow-600 text-white text-xl py-8 px-8 rounded-lg transition-all transform hover:scale-105"
+                                className="w-full md:w-1/2 btn-primary bg-yellow-500 hover:bg-yellow-600 text-white text-xl py-8 px-8 rounded-lg transition-all transform hover:scale-105"
                             >
                                 Aklındaki Hikayeyi Oluştur
                             </button>
