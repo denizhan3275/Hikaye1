@@ -155,4 +155,62 @@ export const generateChatResponse = async (message, story = null) => {
         console.error('Chat API Hatası:', error);
         throw new Error('Mesaj işlenirken bir hata oluştu: ' + error.message);
     }
-} 
+}
+
+export const generateTest = async (storyContent) => {
+    try {
+        const prompt = `Sen bir öğretmensin. Aşağıdaki hikayeyi oku ve bu hikaye hakkında 10 adet çoktan seçmeli soru hazırla. 
+        Her sorunun 4 şıkkı olmalı ve doğru cevabı belirtmelisin.
+
+        Hikaye:
+        ${storyContent}
+
+        Soruları şu formatta hazırla ve yanıtla:
+        [
+            {
+                "question": "Soru metni",
+                "options": ["A şıkkı", "B şıkkı", "C şıkkı", "D şıkkı"],
+                "correctAnswer": "Doğru şıkkın tam metni"
+            }
+        ]
+
+        Sadece JSON formatında yanıt ver, başka açıklama ekleme.`;
+
+        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                    topP: 0.8,
+                    topK: 40
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('API yanıt vermedi');
+        }
+
+        const data = await response.json();
+        const testContent = data.candidates[0].content.parts[0].text;
+
+        // JSON string'i parse et
+        const jsonStr = testContent.replace(/```json\n?|\n?```/g, '').trim();
+        const questions = JSON.parse(jsonStr);
+
+        return questions;
+
+    } catch (error) {
+        console.error('Test oluşturma hatası:', error);
+        throw new Error('Test oluşturulurken bir hata oluştu: ' + error.message);
+    }
+}; 

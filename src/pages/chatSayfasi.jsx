@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaArrowLeft, FaMicrophone, FaPlay, FaStop, FaPlus } from 'react-icons/fa';
+import { FaArrowLeft, FaMicrophone, FaMicrophoneSlash, FaPlay, FaStop, FaPlus } from 'react-icons/fa';
 import backgroundImage from "../assets/background2.jpg";
 import { generateChatResponse } from '../services/api';
 
@@ -28,18 +28,21 @@ export default function ChatSayfasi() {
     // Konuşma tanıma için useEffect
     useEffect(() => {
         if ('webkitSpeechRecognition' in window) {
-            const recognition = new window.webkitSpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
             recognition.lang = 'tr-TR';
 
             recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                setMessage(transcript);
-                setIsListening(false);
+                const lastResult = event.results[event.results.length - 1];
+                if (lastResult.isFinal) {
+                    const transcript = lastResult[0].transcript;
+                    setMessage(prev => prev + ' ' + transcript);
+                }
             };
 
-            recognition.onerror = () => {
+            recognition.onerror = (event) => {
+                console.error('Ses tanıma hatası:', event.error);
                 setIsListening(false);
             };
 
@@ -59,6 +62,21 @@ export default function ChatSayfasi() {
             }
         };
     }, []);
+
+    const stopListening = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsListening(false);
+        }
+    };
+
+    const startListening = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.start();
+            setMessage('');
+            setIsListening(true);
+        }
+    };
 
     // Mikrofon dinlemeyi başlat/durdur
     const toggleListening = () => {
@@ -81,10 +99,33 @@ export default function ChatSayfasi() {
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'tr-TR';
+        utterance.pitch = 1.0; // Ses perdesi (0.1 ile 2 arası)
+        utterance.rate = 1.0; // Konuşma hızı (0.1 ile 10 arası)
+        utterance.volume = 1.0; // Ses seviyesi (0 ile 1 arası)
+
+        // Türkçe kadın sesi için
+        const voices = window.speechSynthesis.getVoices();
+        const turkishVoice = voices.find(voice => voice.lang.includes('tr-TR') && voice.name.includes('Female'));
+        if (turkishVoice) {
+            utterance.voice = turkishVoice;
+        }
+
         utterance.onend = () => setIsSpeaking(false);
         setIsSpeaking(true);
         synthRef.current.speak(utterance);
     };
+
+    // Sesleri yüklemek için useEffect
+    useEffect(() => {
+        const loadVoices = () => {
+            window.speechSynthesis.getVoices();
+        };
+
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+    }, []);
 
     // Component mount olduğunda hoşgeldin mesajı
     useEffect(() => {
@@ -275,10 +316,14 @@ export default function ChatSayfasi() {
                         />
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
-                                onClick={toggleListening}
-                                className={`flex-1 sm:flex-none btn-primary px-4 py-2 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-yellow-500 hover:bg-yellow-600'}`}
+                                onClick={isListening ? stopListening : startListening}
+                                className={`flex-1 sm:flex-none btn-primary px-4 py-2 ${isListening ? "bg-red-500 hover:bg-red-600" : 'bg-yellow-500 hover:bg-yellow-600'}`}
+                                title={isListening ? 'Kaydı Durdur' : 'Sesli Anlatım Başlat'}
                             >
-                                <FaMicrophone className={`w-6 h-6 ${isListening ? 'animate-pulse' : ''}`} />
+                                {isListening ?
+                                    <FaMicrophoneSlash className="w-5 h-5" /> :
+                                    <FaMicrophone className="w-5 h-5" />
+                                }
                             </button>
                             <button
                                 className="flex-1 sm:flex-none btn-primary bg-yellow-500 hover:bg-yellow-600 px-6 py-2"

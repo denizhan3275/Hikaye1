@@ -18,6 +18,7 @@ export default function ChatSayfasi2() {
     const synthRef = useRef(window.speechSynthesis);
     const navigate = useNavigate();
 
+
     const addToFavorites = (text) => {
         try {
             const newFavorite = {
@@ -93,10 +94,7 @@ export default function ChatSayfasi2() {
             };
 
             recognition.onend = () => {
-                // Eğer hala dinleme modundaysak tekrar başlat
-                if (isListening) {
-                    recognition.start();
-                }
+                setIsListening(false);
             };
 
             recognitionRef.current = recognition;
@@ -106,8 +104,11 @@ export default function ChatSayfasi2() {
             if (recognitionRef.current) {
                 recognitionRef.current.stop();
             }
+            if (synthRef.current.speaking) {
+                synthRef.current.cancel();
+            }
         };
-    }, [isListening]); // isListening'i dependency olarak ekledik
+    }, []);
 
     // Metni sesli oku
     const speak = (text) => {
@@ -119,20 +120,32 @@ export default function ChatSayfasi2() {
 
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'tr-TR';
+        utterance.pitch = 1.0; // Ses perdesi (0.1 ile 2 arası)
+        utterance.rate = 1.0; // Konuşma hızı (0.1 ile 10 arası)
+        utterance.volume = 1.0; // Ses seviyesi (0 ile 1 arası)
+
+        // Türkçe kadın sesi için
+        const voices = window.speechSynthesis.getVoices();
+        const turkishVoice = voices.find(voice => voice.lang.includes('tr-TR') && voice.name.includes('Female'));
+        if (turkishVoice) {
+            utterance.voice = turkishVoice;
+        }
+
         utterance.onend = () => setIsSpeaking(false);
         setIsSpeaking(true);
         synthRef.current.speak(utterance);
     };
 
+    // Sesleri yüklemek için useEffect
     useEffect(() => {
-        return () => {
-            if (recognitionRef.current) {
-                recognitionRef.current.stop();
-            }
-            if (synthRef.current.speaking) {
-                synthRef.current.cancel();
-            }
+        const loadVoices = () => {
+            window.speechSynthesis.getVoices();
         };
+
+        loadVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
     }, []);
 
     const toggleListening = () => {
@@ -265,20 +278,22 @@ export default function ChatSayfasi2() {
                         <input
                             ref={inputRef}
                             type="text"
-                            className="w-full flex-1 border-2 border-yellow-500 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white/90"
+                            className="w-full pr-12 flex-1 border-2 border-yellow-500 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 bg-white/90"
                             value={message}
                             placeholder="Hikayeni anlatmaya başla..."
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
+                            rows="4"
                         />
                         <div className="flex gap-2 w-full sm:w-auto">
                             <button
-                                onClick={toggleListening}
-                                className={`flex-1 sm:flex-none btn-primary px-4 py-2 ${isListening ? 'bg-red-500 hover:bg-red-600' : 'bg-yellow-500 hover:bg-yellow-600'}`}
+                                onClick={isListening ? toggleListening : toggleListening}
+                                className={`flex-1 sm:flex-none btn-primary px-4 py-2 ${isListening ? "bg-red-500 hover:bg-red-600" : 'bg-yellow-500 hover:bg-yellow-600'}`}
+                                title={isListening ? 'Kaydı Durdur' : 'Sesli Anlatım Başlat'}
                             >
                                 {isListening ?
-                                    <FaMicrophoneSlash className="w-6 h-6" /> :
-                                    <FaMicrophone className="w-6 h-6" />
+                                    <FaMicrophoneSlash className="w-5 h-5" /> :
+                                    <FaMicrophone className="w-5 h-5" />
                                 }
                             </button>
                             <button
